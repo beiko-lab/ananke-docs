@@ -1,239 +1,104 @@
 ---
-title: API Reference
+title: Ananke
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
-  - ruby
   - python
-  - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
+  - <a href='https://github.com/beiko-lab/ananke'>Ananke GitHub Repository</a>
   - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
 
 includes:
-  - errors
 
 search: true
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Ananke is a utility for clustering and exploring time series from amplicon gene surveys. 
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
-
-# Authentication
-
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+# Installation
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+pip install .
 ```
 
-```javascript
-const kittn = require('kittn');
+The source code can be retrieved from https://github.com/beiko-lab/ananke and installed with pip.
 
-let api = kittn.authorize('meowmeowmeow');
-```
+# Initialization
 
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
 
 ```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+adb = Ananke("ananke_file.h5")
 ```
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
+First, an `Ananke` object must be created, with a storage file set to store the results:
 
 ```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
+adb = Ananke("ananke_file.h5")
+schema = {"series1": {"replicate1": {"samp1": 0,
+                                     "samp2": 1,
+                                     "samp3": 4},
+                      "replicate2": {"samp4": 0,
+                                     "samp5": 1,
+                                     "samp6": 4}},
+          "series2": {"replicate1": {"samp7": 0,
+                                     "samp8": 1,
+                                     "samp9": 4},
+                      "replicate2": {"samp10": 0,
+                                     "samp11": 1,
+                                     "samp12": 4}}}
+adb.initialize(schema)
 ```
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
+A `schema` dictionary must be defined, that contains the `{series: {replicate: {sample: time_point} } }` structure of the data. Time point should be a numeric offset value.
 
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
+# Importing Data From QIIME
 
 ```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
+adb.import_from_qiime("table.qza")
 ```
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
+A QIIME2 table .qza artifact can be imported, as long as the sample names in the table match the sample names in the `schema` used to initialize the `Ananke` object. The table artifact can contain a superset of the samples, and Ananke will take only the samples indicated in `schema`. This makes filtering out series or replicates as simple as removing them from the schema and rerunning.
+
+# Importing Data From FASTA
+
+```python
+adb.import_from_fasta("seq.fasta", unique_fasta="unique_fasta.fasta", min_count=2)
 ```
 
-```javascript
-const kittn = require('kittn');
+The FASTA file must have labels of the form ">sample_*" where sample is the same as in the `schema` used to initialize the `Ananke` object.
+The `unique_fasta` parameter specifies an output file of unique sequences with the labels matching the labels used in the Ananke object. This sequence file should be used for taxonomic classification, so that the results can be merged with the Ananke time series. After the first pass, all unique sequences seen fewer than `min_count` times are immediately rejected. This can be tweaked higher if memory footprint is an issue, or lower if it is not. However, features with only one count are unlikely to yield any useful time-series dynamics.
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
+# Computing Time Series Distances
+
+```python
+dbs = adb.precompute_distances("sts", np.arange(0.1, 2.0, 0.1))
+adb.save_cluster_result(dbs, "sts")
+adb = Ananke("ananke_file.h5")
+dbs = adb.load_cluster_result("sts")
 ```
 
-> The above command returns JSON structured like this:
+The distances between time-series must be pre-computed across a range (supplied in the form of a Python `range` or numpy `np.arange` objects). These distances are stored in a series of bloom filter structures to minimize memory impact and maximize the number of features that can be clustered. To reduce computation time and memory usage, supply a smaller range, or a range with larger steps.
 
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
+Distance measures available are: "sts","euclidean", "dtw", and "ddtw".
+
+The `precompute_distances` function of the `Ananke` objects will return a `DBloomSCAN` object which must be captured into a local variable. This can then be saved to a file, if desired, and loaded later.
+
+# Clustering Time Series
+
+```python
+dist = dbs.dist_range[0]
+clust = dbs.DBSCAN(dist, expand_around=0, max_members=100)
 ```
 
-This endpoint deletes a specific kitten.
+The `DBloomSCAN` object `dbs` contains the relationships between the features at various distances. The DBSCAN algorithm can be run for any distance in the range supplied to `Ananke.precompute_distances()`. With the `expand_around` parameter, the algorithm will return only the single cluster containing the seed time-series indicated by seed index. This tends to be much faster than clustering the entire featurespace. The max_members parameter will return None as soon as the cluster exceeds max_members, which can save significant time if looping over distances and encountering uselessly large clusters, especially for plotting purposes.
 
-### HTTP Request
+# Visualizing Clusters
 
-`DELETE http://example.com/kittens/<ID>`
+```python
+adb.plot_feature_at_distance(dbs, featureid, eps, title_index=tax_index, max_members=100)
+```
 
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
+This function will return a Plotly Figure object that can be plotted in a Jupyter notebook with iplot(x). This runs DBSCAN on the cluster including featureid, with a point radius of eps, and returns a plot that can be static (in a Python script/shell) or interactive (in a Jupyter notebook).
